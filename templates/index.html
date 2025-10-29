@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 운세 - 운세 품앗이</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 로딩 화면 -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <p>오늘의 운세를 확인하는 중...</p>
+        </div>
+
+        <!-- 메인 화면 -->
+        <div id="main-screen" class="main-screen hidden">
+            <!-- 헤더 -->
+            <header class="header">
+                <h1 class="logo">오늘의 운세</h1>
+                <p class="tagline">운을 나누고, 위로를 받는 따뜻한 공간</p>
+            </header>
+
+            <!-- 운세 카드 -->
+            <section class="fortune-card">
+                <div class="fortune-header">
+                    <h2 id="user-nickname" class="user-nickname">행복한하루</h2>
+                    <span id="fortune-date" class="fortune-date">2025년 10월 29일</span>
+                </div>
+
+                <div class="fortune-score-container">
+                    <div class="fortune-score">
+                        <span id="fortune-score" class="score-value">15</span>
+                        <span class="score-unit">%</span>
+                    </div>
+                    <div class="fortune-message">
+                        <p id="fortune-grade-text" class="grade-text">상위 15%의 행운을 가졌어요!</p>
+                        <span id="fortune-grade" class="fortune-grade grade-high">상</span>
+                    </div>
+                </div>
+
+                <div class="fortune-description">
+                    <p id="fortune-description-text">
+                        오늘은 당신에게 특별히 좋은 운이 찾아왔습니다.
+                        좋은 일이 생길 가능성이 높으니 새로운 도전을 해보세요.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 액션 버튼들 -->
+            <section class="action-buttons">
+                <button id="give-fortune-btn" class="action-btn primary-btn hidden">
+                    <span class="btn-icon">🎁</span>
+                    <span class="btn-text">행운 나누기</span>
+                    <span id="direct-requests-badge" class="badge hidden">0</span>
+                </button>
+
+                <button id="receive-fortune-btn" class="action-btn secondary-btn hidden">
+                    <span class="btn-icon">🙏</span>
+                    <span class="btn-text">액막이 받기</span>
+                </button>
+            </section>
+
+            <!-- 직접 요청 섹션 -->
+            <section id="direct-requests-section" class="direct-requests-section hidden">
+                <h3 class="section-title">
+                    나에게 액막이 요청
+                    <span id="request-count" class="count-badge">0건</span>
+                </h3>
+                <div id="direct-requests-list" class="requests-list">
+                    <!-- 요청 카드들이 동적으로 추가됨 -->
+                </div>
+            </section>
+
+            <!-- 통계 섹션 -->
+            <section class="stats-section">
+                <h3 class="section-title">오늘의 통계</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-users">0</span>
+                        <span class="stat-label">오늘의 사용자</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-shares">0</span>
+                        <span class="stat-label">나눈 행운</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-concerns">0</span>
+                        <span class="stat-label">도움이 필요해요</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 받은 행운 섹션 -->
+            <section id="received-fortunes-section" class="received-fortunes-section">
+                <h3 class="section-title">받은 행운</h3>
+                <div id="received-fortunes-list" class="fortunes-list">
+                    <p class="empty-message">아직 받은 행운이 없습니다.</p>
+                </div>
+            </section>
+
+            <!-- 푸터 -->
+            <footer class="footer">
+                <p>&copy; 2025 오늘의 운세. 따뜻한 연결의 공간.</p>
+            </footer>
+        </div>
+
+        <!-- 행운 나누기 모달 -->
+        <div id="give-fortune-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>행운 나누기</h2>
+                    <button class="close-btn" onclick="closeGiveFortuneModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="matching-users-list" class="matching-users-list">
+                        <!-- 매칭된 사용자 카드들이 동적으로 추가됨 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 액막이 받기 모달 -->
+        <div id="receive-fortune-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>액막이 받기</h2>
+                    <button class="close-btn" onclick="closeReceiveFortuneModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="receive-fortune-content">
+                        <!-- 동적으로 내용이 추가됨 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 부적 선택 모달 -->
+        <div id="charm-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>부적과 메시지 보내기</h2>
+                    <button class="close-btn" onclick="closeCharmModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="selected-user-info" class="selected-user-info">
+                        <!-- 선택된 사용자 정보 -->
+                    </div>
+
+                    <div class="charm-selection">
+                        <h3>부적 선택</h3>
+                        <div class="charms-grid">
+                            <div class="charm-item" data-charm="행운">
+                                <div class="charm-icon">🍀</div>
+                                <div class="charm-name">행운</div>
+                            </div>
+                            <div class="charm-item" data-charm="위로">
+                                <div class="charm-icon">💝</div>
+                                <div class="charm-name">위로</div>
+                            </div>
+                            <div class="charm-item" data-charm="힐링">
+                                <div class="charm-icon">🌸</div>
+                                <div class="charm-name">힐링</div>
+                            </div>
+                            <div class="charm-item" data-charm="용기">
+                                <div class="charm-icon">💪</div>
+                                <div class="charm-name">용기</div>
+                            </div>
+                            <div class="charm-item" data-charm="희망">
+                                <div class="charm-icon">⭐</div>
+                                <div class="charm-name">희망</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message-input">
+                        <h3>응원 메시지</h3>
+                        <div class="message-templates">
+                            <button class="template-btn" data-template="힘내세요! 더 좋은 일이 있을 거예요.">힘내세요!</button>
+                            <button class="template-btn" data-template="오늘 하루도 응원합니다!">응원합니다!</button>
+                            <button class="template-btn" data-template="당신은 소중한 사람입니다.">소중해요</button>
+                            <button class="template-btn" data-template="좋은 일만 가득하길 바랍니다.">좋은 일이!</button>
+                        </div>
+                        <textarea id="fortune-message" class="message-textarea"
+                                  placeholder="응원 메시지를 작성해주세요 (최대 200자)"
+                                  maxlength="200"></textarea>
+                        <div class="char-count">
+                            <span id="message-char-count">0</span> / 200
+                        </div>
+                    </div>
+
+                    <button id="send-fortune-btn" class="submit-btn" onclick="sendFortune()">
+                        행운 보내기
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 감사 인사 모달 -->
+        <div id="gratitude-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>감사 인사 보내기</h2>
+                    <button class="close-btn" onclick="closeGratitudeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-description">
+                        나를 응원해준 분들에게 감사 인사를 전하세요.
+                    </p>
+
+                    <div class="message-templates">
+                        <button class="template-btn" data-template="덕분에 힘이 났어요. 정말 고마워요!">힘이 났어요</button>
+                        <button class="template-btn" data-template="정말 고마워요. 당신도 행복하세요!">정말 고마워요</button>
+                        <button class="template-btn" data-template="위로해주셔서 감사합니다!">감사합니다</button>
+                    </div>
+
+                    <textarea id="gratitude-message" class="message-textarea"
+                              placeholder="감사 메시지를 작성해주세요 (최대 100자)"
+                              maxlength="100"></textarea>
+                    <div class="char-count">
+                        <span id="gratitude-char-count">0</span> / 100
+                    </div>
+
+                    <button class="submit-btn" onclick="sendGratitude()">
+                        감사 인사 보내기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
