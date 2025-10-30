@@ -253,12 +253,37 @@ export const AppProvider = ({ children }) => {
     storage.set(STORAGE_KEYS.NOTIFICATIONS, updated);
   };
 
-  // 닉네임 변경
+  // 닉네임 변경 (운세도 함께 새로 생성)
   const changeNickname = () => {
     const newNickname = generateNickname();
     const updated = { ...user, nickname: newNickname };
     setUser(updated);
     storage.set(STORAGE_KEYS.USER, updated);
+
+    // 오늘의 운세 새로 생성
+    const score = generateFortuneScore();
+    const percentile = scoreToPercentile(score);
+    const grade = getFortuneGrade(percentile);
+
+    const newFortune = {
+      date: getTodayString(),
+      score,
+      percentile,
+      grade,
+      createdAt: new Date().toISOString(),
+    };
+
+    setTodayFortune(newFortune);
+
+    // 운세 히스토리 업데이트
+    const fortuneHistory = storage.get(STORAGE_KEYS.FORTUNE_HISTORY, []);
+    const todayString = getTodayString();
+    const updatedHistory = fortuneHistory.filter((f) => f.date !== todayString);
+    updatedHistory.push(newFortune);
+    storage.set(STORAGE_KEYS.FORTUNE_HISTORY, updatedHistory);
+
+    // 도움 요청 목록 새로고침
+    loadHelpRequests();
   };
 
   const value = {
