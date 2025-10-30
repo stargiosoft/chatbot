@@ -1,17 +1,27 @@
 import os
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from openai import OpenAI
-from dotenv import load_dotenv
 
-# 환경 변수 로드
-load_dotenv()
+# 선택적으로 dotenv를 로드해 환경 변수를 채워줍니다.
+try:  # pragma: no cover - optional dependency
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover - optional dependency
+    load_dotenv = None
+
+if load_dotenv:
+    load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-# OpenAI 클라이언트 초기화
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+# OpenAI SDK가 없거나 API 키가 없어도 앱이 구동될 수 있도록 방어 코드를 둡니다.
+try:  # pragma: no cover - optional dependency
+    from openai import OpenAI  # type: ignore
+except ImportError:  # pragma: no cover - optional dependency
+    OpenAI = None  # type: ignore
+
+api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=api_key) if OpenAI and api_key else None
 
 # 기본 사주 정보 (데모용)
 SAJU_INFO = """
@@ -151,8 +161,19 @@ SAJU_INFO = """
     * 주의해야 할 월: 2026년 12월, 2027년 1월, 2027년 11월
 """
 
+def _fallback_fortune_response(question: str) -> str:
+    """OpenAI 연동이 불가능할 때 보여줄 기본 응답."""
+    base = "오늘의 운세는 스스로에게 조금 더 친절해지라는 신호로 보여요. "
+    if question.strip():
+        base += f"질문해준 '{question.strip()}' 상황은 잠시 호흡을 고르고 주변의 응원을 떠올리면 균형을 되찾을 수 있을 거예요. "
+    base += "평소에 나눴던 작은 친절이 돌아오는 만큼, 오늘은 가볍게 몸을 풀고 마음을 돌보는 시간을 가져보세요."
+    return base
+
+
 def get_fortune_response(question):
     """OpenAI API를 사용하여 운세 답변 생성"""
+    if not client:
+        return _fallback_fortune_response(question)
     prompt = f"""
 ## **역할**
 세계적으로 유명한 궁합 전문 사주 명리학자
@@ -188,7 +209,7 @@ def get_fortune_response(question):
 """
     
     try:
-        response = client.chat.completions.create(
+        response = client.chat.completions.create(  # type: ignore[union-attr]
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "당신은 세계적으로 유명한 궁합 전문 사주 명리학자입니다."},
@@ -221,6 +242,6 @@ def get_fortune():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=False)
+

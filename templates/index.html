@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>운세 품앗이</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header class="top-bar">
+        <div class="logo">운세 품앗이</div>
+        <nav class="main-nav">
+            <a href="#experience">서비스 소개</a>
+            <a href="#fortune">오늘의 운세</a>
+            <a href="#matching">행운 나누기</a>
+            <a href="#request">액막이 받기</a>
+        </nav>
+        <button class="mobile-menu" aria-label="메뉴 열기">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </header>
+
+    <main>
+        <section class="hero" id="experience">
+            <div class="hero-text">
+                <p class="eyebrow">혼자서도 연결되는 위로의 루틴</p>
+                <h1>오늘의 운세를 <span>나눔의 순간</span>으로 바꿔보세요</h1>
+                <p class="description">운이 좋은 날엔 내 따뜻함을 전하고, 지친 날엔 낯선 이의 위로를 받아보세요. 익명 속에서 주고받는 포지티브 모멘텀으로 하루의 균형을 찾아드립니다.</p>
+                <div class="cta-group">
+                    <button class="primary" data-state="high">상(上) 시나리오 보기</button>
+                    <button class="secondary" data-state="mid">중(中) 시나리오 보기</button>
+                    <button class="ghost" data-state="low">하(下) 시나리오 보기</button>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="percent-circle">
+                    <span class="percent-value" id="heroPercent">15%</span>
+                    <span class="percent-label">상위 행운</span>
+                </div>
+                <div class="fortune-tier" id="heroTier">오늘은 상(上) 등급!</div>
+                <p class="fortune-copy">행운을 나눠줄 준비가 되었어요. 먼저 나에게 손을 내민 사람부터 살펴볼까요?</p>
+            </div>
+        </section>
+
+        <section class="fortune" id="fortune">
+            <div class="section-head">
+                <h2>오늘의 행운 상태</h2>
+                <p>실시간 행운 백분위와 등급에 따라 필요한 행동을 안내해요.</p>
+            </div>
+            <div class="fortune-card">
+                <div class="fortune-summary">
+                    <span class="fortune-label">현재 행운 지수</span>
+                    <div class="fortune-score" id="fortuneScore">상위 15%</div>
+                    <div class="fortune-tier-pill" id="fortuneTier">상 (上)</div>
+                    <p class="fortune-message" id="fortuneMessage">행운이 가득한 날이에요. 나에게 직접 액막이를 요청한 사람부터 살펴보세요.</p>
+                </div>
+                <div class="fortune-actions">
+                    <button class="fortune-btn" id="shareLuckBtn">행운 나누기</button>
+                    <button class="fortune-btn secondary" id="requestLuckBtn">액막이 받기</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout-grid" id="matching">
+            <article class="panel" id="directRequests">
+                <header>
+                    <h3>나에게 도착한 액막이 요청</h3>
+                    <span class="badge" id="directCount">1</span>
+                </header>
+                <ul class="request-list" id="directList"></ul>
+            </article>
+            <article class="panel" id="matchingPool">
+                <header>
+                    <h3>도움이 필요한 사람들</h3>
+                    <span class="subtext">매칭 우선순위 알고리즘으로 정렬돼요</span>
+                </header>
+                <div class="card-carousel" id="matchingCards"></div>
+                <div class="empty-state" id="matchingEmpty">새로운 추천을 기다리는 중이에요.</div>
+            </article>
+            <article class="panel" id="boonLibrary">
+                <header>
+                    <h3>보낼 수 있는 디지털 부적</h3>
+                    <span class="subtext">상황에 맞는 메시지를 함께 추천해요</span>
+                </header>
+                <ul class="amulet-list" id="amuletList"></ul>
+            </article>
+        </section>
+
+        <section class="layout-grid" id="request">
+            <article class="panel wide">
+                <header>
+                    <h3>액막이 요청하기</h3>
+                    <span class="subtext">행운을 나눠준 기록이 있다면 바로 도움을 받을 수 있어요</span>
+                </header>
+                <form class="request-form" id="requestForm">
+                    <label for="concernInput">현재 고민 (선택사항, 최대 150자)</label>
+                    <textarea id="concernInput" maxlength="150" placeholder="예: 상사한테 혼났어요. 제가 잘못한 것도 아닌데..."></textarea>
+                    <div class="form-footer">
+                        <p class="hint" id="historyInfo">지난 30일 동안 2명에게 행운을 나눴어요.</p>
+                        <button type="submit" class="primary">액막이 요청 보내기</button>
+                    </div>
+                </form>
+            </article>
+            <article class="panel">
+                <header>
+                    <h3>요청 히스토리</h3>
+                    <span class="subtext">보낸 액막이 요청과 응답 상태를 한눈에 확인해요</span>
+                </header>
+                <ul class="history-list" id="historyList"></ul>
+            </article>
+            <article class="panel">
+                <header>
+                    <h3>감사 인사 보내기</h3>
+                    <span class="subtext">응원에 답할 준비가 되었다면 마음을 전해보세요</span>
+                </header>
+                <div class="gratitude">
+                    <p class="gratitude-status" id="gratitudeStatus">보낼 감사 인사가 0건 있어요.</p>
+                    <div class="gratitude-actions">
+                        <select id="gratitudeTemplate">
+                            <option value="덕분에 힘이 났어요">덕분에 힘이 났어요</option>
+                            <option value="정말 고마워요">정말 고마워요</option>
+                            <option value="다시 힘을 내볼게요">다시 힘을 내볼게요</option>
+                        </select>
+                        <button class="secondary" id="sendGratitudeBtn">감사 인사장 보내기</button>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="scenarios">
+            <h2>사용자 시나리오 미리보기</h2>
+            <div class="scenario-grid">
+                <article class="scenario-card">
+                    <h3>시나리오 1: 행운 점수 하</h3>
+                    <p>처음 방문한 사용자는 하위 85%의 운세를 받고 액막이를 요청하려 하지만, 먼저 행운을 나누어야 한다는 안내를 받습니다.</p>
+                </article>
+                <article class="scenario-card">
+                    <h3>시나리오 2: 행운 점수 상</h3>
+                    <p>오늘 상위 15%의 행운을 가진 사용자는 과거에 도왔던 사람의 고민을 확인하고 맞춤 부적과 메시지를 전달합니다.</p>
+                </article>
+                <article class="scenario-card">
+                    <h3>시나리오 3: 고민 작성</h3>
+                    <p>행운 나눔 경험이 있는 사용자는 하위 90%의 운세를 받고 고민을 작성해 액막이를 요청하며 매칭 우선순위에서 상위에 노출됩니다.</p>
+                </article>
+                <article class="scenario-card">
+                    <h3>시나리오 4: 추천 목록 탐색</h3>
+                    <p>중간 행운의 사용자는 직접 요청이 없는 대신 매칭 우선순위 알고리즘이 추천하는 고민 카드를 스와이프하며 도울 대상을 선택합니다.</p>
+                </article>
+                <article class="scenario-card">
+                    <h3>시나리오 5: 감사 인사 루프</h3>
+                    <p>응원을 받은 사용자는 고민 해결 후 감사 인사를 전하며 품앗이의 선순환을 완성합니다.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2025 운세 품앗이. 서로의 하루를 응원하는 익명 연결 플랫폼.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
